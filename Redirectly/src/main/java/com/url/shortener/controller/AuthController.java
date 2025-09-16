@@ -20,7 +20,7 @@ public class AuthController {
 
     @PostMapping("/public/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request){
-        User user = new User(request.getUsername(),request.getEmail(),request.getPassword());
+        User user = new User(request.getEmail(),request.getUsername(),request.getPassword());
 
         userService.registerUser(user);
         return ResponseEntity.ok("User registered successfully");

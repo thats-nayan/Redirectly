@@ -1,9 +1,14 @@
 package com.url.shortener.security;
 
+import com.url.shortener.dto.UrlMappingDTO;
+import com.url.shortener.models.UrlMapping;
 import com.url.shortener.security.jwt.JwtAuthenticationFilter;
 import com.url.shortener.security.jwt.JwtUtils;
 import com.url.shortener.service.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,13 +30,26 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private UserDetailsServiceImpl userDetailsService;
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(new JwtUtils(), userDetailsService);
-    }
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        ModelMapper modelMapper = new ModelMapper();
+
+        modelMapper.addMappings(new PropertyMap<UrlMapping, UrlMappingDTO>() {
+            @Override
+            protected void configure() {
+                map().setCreatedBy(source.getUser().getUsername());
+            }
+        });
+
+        return modelMapper;
     }
 
     @Bean
@@ -54,7 +72,7 @@ public class WebSecurityConfig {
 
         http.authenticationProvider(daoAuthenticationProvider());
         // Add filter jwtAuthenticationFilter before UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
