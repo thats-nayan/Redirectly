@@ -49,4 +49,13 @@ public class UrlMappingController {
                                                                @RequestParam("endDate") String endDate) {
         return ResponseEntity.ok(urlMappingService.getUrlAnalytics(shortUrl,startDate,endDate));
     }
+
+    @GetMapping("/totalClicks")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<ClickEventDTO>> getTotalClicksAnalytics(Principal principal,
+                                                               @RequestParam("startDate") String startDate,
+                                                               @RequestParam("endDate") String endDate) {
+        User user = userService.findByUsername(principal.getName());
+        return ResponseEntity.ok(urlMappingService.getUserAnalytics(user,startDate,endDate));
+    }
 }

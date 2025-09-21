@@ -16,7 +16,10 @@ import com.url.shortener.repository.UrlMappingRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Service
 public class UrlMappingService {
@@ -59,26 +62,28 @@ public class UrlMappingService {
     }
 
     public List<ClickEventDTO> getUrlAnalytics(String shortUrl, String startDate, String endDate) {
-        LocalDate start = LocalDate.parse(startDate);
-        LocalDate end = LocalDate.parse(endDate);
+        LocalDateTime start = LocalDateTime.parse(startDate);
+        LocalDateTime end = LocalDateTime.parse(endDate);
 
         // First check if the URL exists
         UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
 
-//        if (urlMapping != null) {
-//            // Filter click events based on the date range
-//            List<UrlMapping> filteredClickEvents = urlMapping.getClickEvents().stream()
-//                    .filter(clickEvent -> {
-//                        LocalDate clickDate = clickEvent.getClickDate().toLocalDate();
-//                        return (clickDate.isEqual(start) || clickDate.isAfter(start)) &&
-//                                (clickDate.isEqual(end) || clickDate.isBefore(end));
-//                    })
-//                    .toList();
-//
-//            return filteredClickEvents.stream()
-//                    .map(clickEvent -> modelMapper.map(clickEvent, UrlMappingDTO.class))
-//                    .toList();
-//        }
+        if (urlMapping != null) {
+            List<ClickEvent> clickEvents = clickEventRepository.findByUrlMappingAndClickDateBetween(urlMapping, start, end);
+
+            // Group by date and count
+            Map<LocalDate, Long> counts = clickEvents.stream()
+                    .collect(Collectors.groupingBy(
+                            c -> c.getClickDate().toLocalDate(), // extract date
+                            TreeMap::new, // keeps keys sorted
+                            Collectors.counting()
+                    ));
+
+            // Convert to DTO list
+            return counts.entrySet().stream()
+                    .map(entry -> new ClickEventDTO(entry.getKey(), entry.getValue()))
+                    .toList();
+        }
         return List.of();
     }
 
@@ -97,5 +102,28 @@ public class UrlMappingService {
             return urlMapping;
         }
         return null;
+    }
+
+    public List<ClickEventDTO> getUserAnalytics(User user, String startDate, String endDate) {
+
+        LocalDateTime start = LocalDateTime.parse(startDate);
+        LocalDateTime end = LocalDateTime.parse(endDate);
+
+        // Fetch all URLs for the user
+        List<UrlMapping> userUrls = urlMappingRepository.findByUser(user);
+        List<ClickEvent> clickEvents = clickEventRepository.findByUrlMappingInAndClickDateBetween(userUrls, start, end);
+
+        // Group by date and count
+        Map<LocalDate, Long> counts = clickEvents.stream()
+                .collect(Collectors.groupingBy(
+                        c -> c.getClickDate().toLocalDate(), // extract date
+                        TreeMap::new, // keeps keys sorted
+                        Collectors.counting()
+                ));
+
+        // Convert to DTO list
+        return counts.entrySet().stream()
+                .map(entry -> new ClickEventDTO(entry.getKey(), entry.getValue()))
+                .toList();
     }
 }
