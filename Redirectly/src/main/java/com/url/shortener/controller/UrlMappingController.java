@@ -44,7 +44,6 @@ public class UrlMappingController {
         return ResponseEntity.ok(urlMappingService.getUrlsByUser(user));
     }
 
-    // TODO: Add exception if given shortUrl does not exists
     @GetMapping("/analytics/{shortUrl}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<ClickEventDTO>> getUrlAnalytics(@PathVariable String shortUrl,
