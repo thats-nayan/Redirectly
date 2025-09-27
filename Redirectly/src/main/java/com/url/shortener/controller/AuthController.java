@@ -4,6 +4,7 @@ import com.url.shortener.dto.LoginRequest;
 import com.url.shortener.dto.RegisterRequest;
 import com.url.shortener.models.User;
 import com.url.shortener.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,7 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/public/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request){
         User user = new User(request.getEmail(),request.getUsername(),request.getPassword());
 
         userService.registerUser(user);
@@ -27,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/public/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest request){
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest request){
         // Login logic will be handled by Spring Security
         return ResponseEntity.ok(userService.loginUser(request));
     }
