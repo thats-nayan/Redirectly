@@ -12,7 +12,7 @@ import java.util.Map;
 // Handles all exceptions globally for the application
 public class MyGlobalExceptionHandler {
 
-    // For all validation errors, this method will be invoked
+    // Validation errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
      public ResponseEntity<Map<String,String>> methodArgumentNotValidException(MethodArgumentNotValidException e){
          Map<String,String> response = new HashMap<>();
@@ -27,4 +27,17 @@ public class MyGlobalExceptionHandler {
          return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
      }
 
+     // Resource not found errors
+     @ExceptionHandler(ResourceNotFoundException.class)
+     public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException e){
+        String message = e.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+     }
+
+     // User already exists errors
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<String> handleUserAlreadyExistsException(UserAlreadyExistsException e){
+        String message = e.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
 }
