@@ -1,6 +1,10 @@
 package com.url.shortener.service;
 
 import com.url.shortener.dto.LoginRequest;
+import com.url.shortener.dto.RegisterRequest;
+import com.url.shortener.exceptions.ResourceNotFoundException;
+import com.url.shortener.exceptions.UserAlreadyExistsException;
+import com.url.shortener.models.UrlMapping;
 import com.url.shortener.models.User;
 import com.url.shortener.repository.UserRepository;
 import com.url.shortener.security.jwt.JwtAuthenticationResponse;
@@ -21,7 +25,19 @@ public class UserService {
     private AuthenticationManager authenticationManager;
     private JwtUtils jwtUtils;
 
-    public void registerUser(User user) {
+    public void registerUser(RegisterRequest request) {
+        // Check if username or email already exists and throw exception if they do
+        userRepository.findByUsername(request.getUsername())
+                .ifPresent(user -> {
+                    throw new UserAlreadyExistsException("username", request.getUsername());
+                });
+
+        userRepository.findByEmail(request.getEmail())
+                .ifPresent(user -> {
+                    throw new UserAlreadyExistsException("email", request.getEmail());
+                });
+
+        User user = new User(request.getEmail(), request.getUsername(),request.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }

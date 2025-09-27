@@ -2,6 +2,7 @@ package com.url.shortener.service;
 
 import com.url.shortener.dto.ClickEventDTO;
 import com.url.shortener.dto.UrlMappingDTO;
+import com.url.shortener.exceptions.ResourceNotFoundException;
 import com.url.shortener.models.ClickEvent;
 import com.url.shortener.models.UrlMapping;
 import com.url.shortener.models.User;
@@ -66,7 +67,8 @@ public class UrlMappingService {
         LocalDateTime end = LocalDateTime.parse(endDate);
 
         // First check if the URL exists
-        UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
+        UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl)
+                .orElseThrow(() -> new ResourceNotFoundException("Short URL","id",shortUrl));
 
         if (urlMapping != null) {
             List<ClickEvent> clickEvents = clickEventRepository.findByUrlMappingAndClickDateBetween(urlMapping, start, end);
@@ -88,7 +90,10 @@ public class UrlMappingService {
     }
 
     public UrlMapping getOriginalUrl(String shortUrl) {
-        UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
+        // First check if the URL exists
+        UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl)
+                .orElseThrow(() -> new ResourceNotFoundException("Short URL","id",shortUrl));
+
         if (urlMapping != null) {
             urlMapping.setClickCount(urlMapping.getClickCount() + 1);
             urlMappingRepository.save(urlMapping);
