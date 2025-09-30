@@ -10,6 +10,7 @@ const TextField = ({
   min, // Minimum length for the input field
   value, // Value of the input field
   placeholder, // Placeholder text for the input field
+  variant, // Variant to determine specific validation rules (e.g., 'register' or 'login')
 }) => {
   return (
     <div className="flex flex-col gap-1">
@@ -30,36 +31,45 @@ const TextField = ({
         {...register(id, {
           required: { value: required, message },
 
-          minLength: type === "username"
-            ? { value: 3, message: "Username must be at least 3 characters" }
-            : type === "password"
-              ? { value: 8, message: "Password must be at least 8 characters" }
-              : min
-                ? { value: min, message: `Minimum ${min} character${min > 1 ? 's' : ''} is required` }
-                : undefined,
+          minLength: variant === "register"
+            ? type === "username"
+              ? { value: 3, message: "Username must be at least 3 characters" }
+              : type === "password"
+                ? { value: 8, message: "Password must be at least 8 characters" }
+                : min
+                  ? { value: min, message: `Minimum ${min} character${min > 1 ? 's' : ''} is required` }
+                  : undefined
+            : undefined,
 
           pattern:
-            type === "username"
-              ? {
-                value: /^[a-zA-Z0-9_]{3,20}$/,
-                message: "Username must be 3–20 characters, only letters, numbers, and underscores",
-              }
-              : type === "email"
+            variant === "register"
+              ? type === "username"
                 ? {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Invalid email format",
+                  value: /^[a-zA-Z0-9_]{3,20}$/,
+                  message:
+                    "Username must be 3–20 characters, only letters, numbers, and underscores",
                 }
-                : type === "password"
+                : type === "email"
                   ? {
-                    value: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,64}$/,
-                    message: "Password must contain at least one uppercase, lowercase, digit, and special character",
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Invalid email format",
                   }
-                  : type === "url"
+                  : type === "password"
                     ? {
-                      value: /^(https?:\/\/)?(([a-zA-Z0-9\u00a1-\uffff-]+\.)+[a-zA-Z\u00a1-\uffff]{2,})(:\d{2,5})?(\/[^\s]*)?$/,
-                      message: "Please enter a valid url",
+                      value:
+                        /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,64}$/,
+                      message:
+                        "Password must contain at least one uppercase, lowercase, digit, and special character",
                     }
-                    : null,
+                    : type === "url"
+                      ? {
+                        value:
+                          /^(https?:\/\/)?(([a-zA-Z0-9\u00a1-\uffff-]+\.)+[a-zA-Z\u00a1-\uffff]{2,})(:\d{2,5})?(\/[^\s]*)?$/,
+                        message: "Please enter a valid url",
+                      }
+                      : null
+              : null,
+
         })}
 
 

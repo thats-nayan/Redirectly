@@ -64,6 +64,7 @@ const RegisterPage = () => {
                         message="*Username is required"
                         placeholder="Type your username"
                         register={register}
+                        variant="register"
                         errors={errors}
                     />
 
@@ -75,6 +76,7 @@ const RegisterPage = () => {
                         message="*Email is required"
                         placeholder="Type your email"
                         register={register}
+                        variant="register"
                         errors={errors}
                     />
 
@@ -86,6 +88,7 @@ const RegisterPage = () => {
                         message="*Password is required"
                         placeholder="Type your password"
                         register={register}
+                        variant="register"
                         errors={errors}
                     />
                 </div>

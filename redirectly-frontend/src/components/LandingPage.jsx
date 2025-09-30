@@ -1,13 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import React from "react";
+import React, { useContext } from "react";
 import { motion } from "framer-motion";
-
+import { ContextApi } from "../contextApi/ContextApi";
 import Card from "./Card";
+
 
 let desc =
   "Generate short, memorable links with ease using Redirectly’s intuitive interface. Share URLs effortlessly across platforms. Optimize your sharing strategy with Redirectly. Track clicks and manage your links seamlessly to enhance your online presence. Generate short, memorable links with ease using Redirectly’s intuitive interface. Share URLs effortlessly across platforms.";
 
 const LandingPage = () => {
+  const {navigate} = useNavigate();
+  const {token} = useContext(ContextApi);
+
   const dashBoardNavigateHandler = () => {
 
   };
