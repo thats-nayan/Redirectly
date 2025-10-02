@@ -34,4 +34,33 @@ export const useFetchTotalClicks = (token , onError) => {
         });
 }
 
+export const useFetchMyShortUrls = (token , onError) => {
+    return useQuery("url-myshorturls", 
+        async ()=>{
+            const response = await api.get(
+                `/api/urls/myurls`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            return response.data;
+        } , 
+        {
+            // Transformation required
+            select: (data) => {
+                const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                return sortedData;
+            },
+            // Custom Error Handling
+            onError,
+            // Does not refetch for 5 seconds
+            // Used for caching to optimize performance
+            staleTime: 5000
+        });
+}
+
 // In useQuery, the first argument is a unique key for the query, the second argument is an async function that fetches the data, and the third argument is an options object where we can do transform response in particular format and handle errors using onError callback function.
