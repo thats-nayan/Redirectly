@@ -16,6 +16,7 @@ import com.url.shortener.repository.UrlMappingRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -63,15 +64,18 @@ public class UrlMappingService {
     }
 
     public List<ClickEventDTO> getUrlAnalytics(String shortUrl, String startDate, String endDate) {
-        LocalDateTime start = LocalDateTime.parse(startDate);
-        LocalDateTime end = LocalDateTime.parse(endDate);
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+
+        LocalDateTime startDateTime = start.atStartOfDay();
+        LocalDateTime endDateTime = end.atTime(LocalTime.MAX);
 
         // First check if the URL exists
         UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl)
                 .orElseThrow(() -> new ResourceNotFoundException("Short URL","id",shortUrl));
 
         if (urlMapping != null) {
-            List<ClickEvent> clickEvents = clickEventRepository.findByUrlMappingAndClickDateBetween(urlMapping, start, end);
+            List<ClickEvent> clickEvents = clickEventRepository.findByUrlMappingAndClickDateBetween(urlMapping, startDateTime, endDateTime);
 
             // Group by date and count
             Map<LocalDate, Long> counts = clickEvents.stream()
@@ -111,12 +115,15 @@ public class UrlMappingService {
 
     public List<ClickEventDTO> getUserAnalytics(User user, String startDate, String endDate) {
 
-        LocalDateTime start = LocalDateTime.parse(startDate);
-        LocalDateTime end = LocalDateTime.parse(endDate);
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+
+        LocalDateTime startDateTime = start.atStartOfDay();
+        LocalDateTime endDateTime = end.atTime(LocalTime.MAX);
 
         // Fetch all URLs for the user
         List<UrlMapping> userUrls = urlMappingRepository.findByUser(user);
-        List<ClickEvent> clickEvents = clickEventRepository.findByUrlMappingInAndClickDateBetween(userUrls, start, end);
+        List<ClickEvent> clickEvents = clickEventRepository.findByUrlMappingInAndClickDateBetween(userUrls, startDateTime, endDateTime);
 
         // Group by date and count
         Map<LocalDate, Long> counts = clickEvents.stream()
