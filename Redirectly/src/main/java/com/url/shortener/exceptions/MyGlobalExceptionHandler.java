@@ -40,4 +40,11 @@ public class MyGlobalExceptionHandler {
         String message = e.getMessage();
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
+
+    // Incorrect credentials errors
+    @ExceptionHandler(IncorrectCredentialException.class)
+    public ResponseEntity<String> handleIncorrectCredentialException(IncorrectCredentialException e){
+        String message = e.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
 }
