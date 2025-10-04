@@ -9,11 +9,11 @@ let desc =
   "Generate short, memorable links with ease using Redirectly’s intuitive interface. Share URLs effortlessly across platforms. Optimize your sharing strategy with Redirectly. Track clicks and manage your links seamlessly to enhance your online presence. Generate short, memorable links with ease using Redirectly’s intuitive interface. Share URLs effortlessly across platforms.";
 
 const LandingPage = () => {
-  const {navigate} = useNavigate();
+  const navigate = useNavigate();
   const {token} = useContext(ContextApi);
 
   const dashBoardNavigateHandler = () => {
-
+    navigate("/dashboard")
   };
   return (
     <div className="min-h-[calc(100vh-64px)]  lg:px-14 sm:px-8 px-4">
